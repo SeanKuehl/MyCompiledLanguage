@@ -161,16 +161,159 @@ void AddStringValue(vector<void*> args) {
 	}
 
 }
-//make the unfiltered list extern global and then edit the list/do loops from here or something
-//have a "stack pointer" that I can shift so that the execute function won't execute things it doens't need to
-//like commands inside of a function, this function should be able to manipulate it
+
+bool IsIntIfTrue(int firstArg, string op, int secondArg) {
+
+	//get what operator it is
+	if (op == "<") {
+		if (firstArg < secondArg) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (op == ">") {
+		if (firstArg > secondArg) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (op == "=") {
+		if (firstArg == secondArg) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (op == "!") {
+		if (firstArg != secondArg) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	cout << "There was an error in the IsIntIfTrue func in standard library" << endl;
+	return false;
+}
+
+//consider having named end ifs (endif: "hello")
+void UserVarAndIntIfConditional(vector<void*> args) {
+	//assume first is user variable, second is operator, third is integer, fourth is string name of endif
+	string variableName = *(string*)(args.at(0));
+	int variableValue = 0;
+	string secondArgumentValue = *(string*)(args.at(1));
+	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the | at the start
+	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the | on the end
+	int thirdArgumentValue = stoi((*(string*)args.at(2)));
+	string fourthArgumentValue = *(string*)(args.at(3));	//we'll be comparing it with another string, so don't cut off the ""
+	
+
+
+	for (int i = 0; i < userVariables.size(); i++) {
+		if (variableName == userVariables.at(i).GetName()) {
+			variableValue = stoi(userVariables.at(i).GetValue());
+			
+		}
+	}
+
+	if (IsIntIfTrue(variableValue, secondArgumentValue, thirdArgumentValue)) {
+		//let the code below execute
+	}
+	else {
+		//the if is false, skip ahead to the next endif with the same name as the fourth argument
+		
+
+		for (int i = instructionPointer; i < filteredLines.size(); i++) {
+			if (filteredLines.at(i).GetCommand() == "endif") {
+				//there is only one parameter in an endif
+				if (filteredLines.at(i).GetParameters().at(0) == fourthArgumentValue) {
+					instructionPointer = i + 1;	//set the instruction pointer to the instruction after the endif
+					break;
+				}
+			}
+		}
+	}
+
+
+}
+
+
+void UserVarAndIntWhileLoop(vector<void*> args) {
+	//assume first is user variable, second is operator, third is integer, fourth is string name of endwhile
+	string variableName = *(string*)(args.at(0));
+	int variableValue = 0;
+	string secondArgumentValue = *(string*)(args.at(1));
+	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the | at the start
+	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the | on the end
+	int thirdArgumentValue = stoi((*(string*)args.at(2)));
+	string fourthArgumentValue = *(string*)(args.at(3));	//we'll be comparing it with another string, so don't cut off the ""
+
+
+
+	for (int i = 0; i < userVariables.size(); i++) {
+		if (variableName == userVariables.at(i).GetName()) {
+			variableValue = stoi(userVariables.at(i).GetValue());
+
+		}
+	}
+
+	if (IsIntIfTrue(variableValue, secondArgumentValue, thirdArgumentValue)) {
+		//let the code below execute
+	}
+	else {
+		//the if is false, skip ahead to the next endif with the same name as the fourth argument
+
+
+		for (int i = instructionPointer; i < filteredLines.size(); i++) {
+			if (filteredLines.at(i).GetCommand() == "endwhile") {
+				//there is only one parameter in an endif
+				if (filteredLines.at(i).GetParameters().at(0) == fourthArgumentValue) {
+					instructionPointer = i + 1;	//set the instruction pointer to the instruction after the endwhile
+					break;
+				}
+			}
+		}
+	}
+}
+
+void EndWhile(vector<void*> args) {
+	//expecting only one argument, the name of a while loop
+	//if this has been reached, we go back to where the while loop is 
+	string firstArgumentValue = *(string*)(args.at(0));	//don't want to cut off "" because we'll be comparing with another string
+	//go backwards through the list, the while loop is "above" us
+	for (int i = instructionPointer; i > -1; i--) {
+		if (filteredLines.at(i).GetCommand() == "while") {
+			//there is only one parameter in an endif
+			if (filteredLines.at(i).GetParameters().at(3) == firstArgumentValue) {
+				instructionPointer = i;	//set the instruction pointer to the while loop, we need it to check if it should run again
+				break;
+			}
+		}
+	}
+
+}
+
+
+//while loops will work almost the same as if statements, only different is the endwhile will actually run most times, because it might have to 
+//go back to start as opposed to the endif which is never actually run and is always skipped
 
 vector<StandardLibraryFunction> LoadStandardLibrary() {
 	//there will be some UGLY code in this function
 
 	vector<StandardLibraryFunction> standardLib;
-
 	
+	standardLib.push_back(StandardLibraryFunction("endwhile", { "string" }, EndWhile));
+	standardLib.push_back(StandardLibraryFunction("while", { "user variable", "operator", "integer", "string" }, UserVarAndIntWhileLoop));
+
+	//this worked first try! (the if statement)
+	standardLib.push_back(StandardLibraryFunction("if", { "user variable", "operator", "integer", "string" }, UserVarAndIntIfConditional));
+
 	standardLib.push_back(StandardLibraryFunction("add", { "user variable", "integer" }, AddIntegerValue));
 	standardLib.push_back(StandardLibraryFunction("add", { "user variable", "string" }, AddStringValue));
 

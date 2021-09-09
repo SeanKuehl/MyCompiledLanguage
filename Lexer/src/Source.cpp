@@ -40,6 +40,11 @@ bool ParameterIsDouble(string parameter);
 
 vector<StandardLibraryFunction> standardLib = LoadStandardLibrary();
 vector<UserVariable> userVariables;
+int instructionPointer = 0;
+
+vector<string> unfilteredText = GetTextFromFile();
+vector<UnfilteredLine> unfilteredLineList = GetTokensFromLinesOfText(unfilteredText);
+vector<FilteredLine> filteredLines = FilterAllLines(unfilteredLineList);
 
 int main(void) {
     
@@ -53,9 +58,8 @@ int main(void) {
     string myText;
     string thisToken = "";
 
-    vector<string> unfilteredText = GetTextFromFile();
-    vector<UnfilteredLine> unfilteredLineList = GetTokensFromLinesOfText(unfilteredText);
-    vector<FilteredLine> filteredLines = FilterAllLines(unfilteredLineList);
+    
+    
     ExecuteLines(filteredLines);
     //format: read until first ':', this is the command
     //after space after first ':' read until ;, and so on until there are no more, ; signals there is another parameter
@@ -79,18 +83,18 @@ void ExecuteLines(vector<FilteredLine> linesToRun) {
     
     
 
-    for (int i = 0; i < linesToRun.size(); i++) {
+    for (instructionPointer = 0; instructionPointer < linesToRun.size(); instructionPointer++) {
         for (int k = 0; k < standardLib.size(); k++) {
             //create a list of strings, one for each parameter in line(needs to be here so it doesn't go out of scope before CallFunction happens)
-            vector<string> temp = linesToRun.at(i).GetParameters();
+            vector<string> temp = linesToRun.at(instructionPointer).GetParameters();
             
-            if (linesToRun.at(i).GetCommand() == standardLib.at(k).GetName()) {
-                if (linesToRun.at(i).GetParameterTypes() == standardLib.at(k).GetArgumentTypes()) {
+            if (linesToRun.at(instructionPointer).GetCommand() == standardLib.at(k).GetName()) {
+                if (linesToRun.at(instructionPointer).GetParameterTypes() == standardLib.at(k).GetArgumentTypes()) {
                     //execute function
                     //convert parameters to void* to pass to the function
                     vector<void*> parametersToPassToFunction;
-                    for (int j = 0; j < linesToRun.at(i).GetParameters().size(); j++) {
-                        temp.at(j) = linesToRun.at(i).GetParameters().at(j);
+                    for (int j = 0; j < linesToRun.at(instructionPointer).GetParameters().size(); j++) {
+                        temp.at(j) = linesToRun.at(instructionPointer).GetParameters().at(j);
                         
                         void* convertedParam = &temp.at(j);
                         
@@ -172,6 +176,10 @@ string FilterParameter(string parameter) {
     //is it a string? It is if the first and last character are "
     if (parameter.at(0) == '"' && parameter.at(parameter.size() - 1) == '"') {
         return "string";
+    }
+    //is it an operator? (<,>,=,!=), operators will be surrounded by '|'s
+    else if (parameter.at(0) == '|' && parameter.at(parameter.size() - 1) == '|') {
+        return "operator";
     }
     //is it a char? It is if the first and last character are '(should also check it's size)
     else if (parameter.at(0) == '\'' && parameter.at(parameter.size() - 1) == '\'' && parameter.size() == SIZE_OF_ALL_CHARS) {

@@ -1,6 +1,12 @@
 int: x;20;
 add: x;10;
+if: x;|=|;30; "hello";
 print: x;
+endif: "hello";
+while: x;|>|;0; "bye";
+add: x;-1;
+print: x;
+endwhile: "bye";
 string: y;"hello";
 add: y;"why";
 print: y;
