@@ -1,0 +1,6 @@
+int: x;20;
+add: x;10;
+print: x;
+string: y;"hello";
+add: y;"why";
+print: y;
