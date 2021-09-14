@@ -186,15 +186,18 @@ string FilterParameter(string parameter) {
     else if (parameter.at(0) == '\'' && parameter.at(parameter.size() - 1) == '\'' && parameter.size() == SIZE_OF_ALL_CHARS) {
         return "character";
     }
+
+    //check if it's a double
+    else if (ParameterIsDouble(parameter)) {
+        return "double";
+    }
+
     //check if it's integer
     //make funcs with try/catch to check whether parameter is int, float, etc.
     else if (ParameterIsInteger(parameter)) {
         return "integer";
     }
-    //check if it's a double
-    else if (ParameterIsDouble(parameter)) {
-        return "double";
-    }
+    
     else {
         
         //because I don't execute things right away, userVariables isn't populated until during the execution phase
@@ -220,9 +223,16 @@ bool ParameterIsInteger(string parameter) {
 bool ParameterIsDouble(string parameter) {
     try {
         //stod would allow integers as well, be careful
-        double dubParam = stod(parameter);
-        dubParam -= 5.0;
-        return true;
+
+        for (int i = 0; i < parameter.size(); i++) {
+            if (parameter.at(i) == '.') {
+                double dubParam = stod(parameter);
+                dubParam -= 5.0;
+                return true;
+            }
+        }
+        return false;
+        
     }
     catch (...) {
         //something went wrong, probably not an int

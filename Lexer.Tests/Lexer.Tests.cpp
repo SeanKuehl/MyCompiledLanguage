@@ -16,8 +16,11 @@ namespace LexerTests
 		
 		TEST_METHOD(TestMethod1)
 		{
-			string expected = "x";
-			string input = "x";
+			//change it so that the double check comes first
+			//and looks for a period in the num, as well as checks for 
+			//valid stod conversion
+			string expected = "double";
+			string input = "10.0";
 			string actual = FilterParameter(input);
 			Assert::AreEqual(expected, actual);
 		}
