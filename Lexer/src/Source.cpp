@@ -6,6 +6,7 @@
 #include <string>
 #include <stdlib.h>
 
+#include "Source.h"
 #include "UnfilteredLine.h"
 #include "FilteredLine.h"
 

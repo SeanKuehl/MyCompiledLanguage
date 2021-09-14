@@ -7,6 +7,9 @@
 #include "UserVariable.h"
 #include "StandardLibrary.h"
 
+#include "Add.h"
+#include "Set.h"
+
 
 using namespace std;
 
@@ -94,73 +97,73 @@ void GetUserInput(vector<void*> args) {
 
 }
 
-void SetIntegerValue(vector<void*> args) {
-	//assume two arguments, a user variable and an integer
-	string variableName = *(string*)(args.at(0));
-	string secondArgumentValue = *(string*)(args.at(1));	//we store values are strings, so just keep it string for now
-	//this one fails but the string version succeeds no problems. Problem could also be in the prints
-	for (int i = 0; i < userVariables.size(); i++) {
-		
-		if (variableName == userVariables.at(i).GetName()) {
-			
-			userVariables.at(i).SetValue(secondArgumentValue);
-		}
-	}
+//void SetIntegerValue(vector<void*> args) {
+//	//assume two arguments, a user variable and an integer
+//	string variableName = *(string*)(args.at(0));
+//	string secondArgumentValue = *(string*)(args.at(1));	//we store values are strings, so just keep it string for now
+//	//this one fails but the string version succeeds no problems. Problem could also be in the prints
+//	for (int i = 0; i < userVariables.size(); i++) {
+//		
+//		if (variableName == userVariables.at(i).GetName()) {
+//			
+//			userVariables.at(i).SetValue(secondArgumentValue);
+//		}
+//	}
+//
+//}
+//
+//void SetStringValue(vector<void*> args) {
+//	//assume two arguments, a user variable and a string
+//	string variableName = *(string*)(args.at(0));
+//	string secondArgumentValue = *(string*)(args.at(1));
+//	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the " at the start
+//	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the " on the end
+//
+//	for (int i = 0; i < userVariables.size(); i++) {
+//		if (variableName == userVariables.at(i).GetName()) {
+//			userVariables.at(i).SetValue(secondArgumentValue);
+//		}
+//	}
+//
+//}
 
-}
-
-void SetStringValue(vector<void*> args) {
-	//assume two arguments, a user variable and a string
-	string variableName = *(string*)(args.at(0));
-	string secondArgumentValue = *(string*)(args.at(1));
-	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the " at the start
-	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the " on the end
-
-	for (int i = 0; i < userVariables.size(); i++) {
-		if (variableName == userVariables.at(i).GetName()) {
-			userVariables.at(i).SetValue(secondArgumentValue);
-		}
-	}
-
-}
-
-
-void AddIntegerValue(vector<void*> args) {
-	//assume two arguments, a user variable and an integer
-	string variableName = *(string*)(args.at(0));
-	int secondArgumentValue = stoi(*(string*)(args.at(1)));	
-	//this one fails but the string version succeeds no problems. Problem could also be in the prints
-	for (int i = 0; i < userVariables.size(); i++) {
-
-		if (variableName == userVariables.at(i).GetName()) {
-			int currentValue = stoi(userVariables.at(i).GetValue());
-			currentValue += secondArgumentValue;
-			string valueToSet = to_string(currentValue);
-			userVariables.at(i).SetValue(valueToSet);
-		}
-	}
-
-}
-
-
-void AddStringValue(vector<void*> args) {
-	//assume two arguments, a user variable and a string
-	string variableName = *(string*)(args.at(0));
-	string secondArgumentValue = *(string*)(args.at(1));
-	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the " at the start
-	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the " on the end
-
-	for (int i = 0; i < userVariables.size(); i++) {
-		if (variableName == userVariables.at(i).GetName()) {
-			string currentValue = userVariables.at(i).GetValue();
-			currentValue += secondArgumentValue;
-			
-			
-			userVariables.at(i).SetValue(currentValue);
-		}
-	}
-
-}
+//
+//void AddIntegerValue(vector<void*> args) {
+//	//assume two arguments, a user variable and an integer
+//	string variableName = *(string*)(args.at(0));
+//	int secondArgumentValue = stoi(*(string*)(args.at(1)));	
+//	//this one fails but the string version succeeds no problems. Problem could also be in the prints
+//	for (int i = 0; i < userVariables.size(); i++) {
+//
+//		if (variableName == userVariables.at(i).GetName()) {
+//			int currentValue = stoi(userVariables.at(i).GetValue());
+//			currentValue += secondArgumentValue;
+//			string valueToSet = to_string(currentValue);
+//			userVariables.at(i).SetValue(valueToSet);
+//		}
+//	}
+//
+//}
+//
+//
+//void AddStringValue(vector<void*> args) {
+//	//assume two arguments, a user variable and a string
+//	string variableName = *(string*)(args.at(0));
+//	string secondArgumentValue = *(string*)(args.at(1));
+//	secondArgumentValue.erase(secondArgumentValue.begin() + 0);	//trim off the " at the start
+//	secondArgumentValue.erase(secondArgumentValue.begin() + (secondArgumentValue.size() - 1));	//trim off the " on the end
+//
+//	for (int i = 0; i < userVariables.size(); i++) {
+//		if (variableName == userVariables.at(i).GetName()) {
+//			string currentValue = userVariables.at(i).GetValue();
+//			currentValue += secondArgumentValue;
+//			
+//			
+//			userVariables.at(i).SetValue(currentValue);
+//		}
+//	}
+//
+//}
 
 bool IsIntIfTrue(int firstArg, string op, int secondArg) {
 
@@ -289,7 +292,7 @@ void EndWhile(vector<void*> args) {
 	//go backwards through the list, the while loop is "above" us
 	for (int i = instructionPointer; i > -1; i--) {
 		if (filteredLines.at(i).GetCommand() == "while") {
-			//there is only one parameter in an endif
+			//get the while's fourth argument
 			if (filteredLines.at(i).GetParameters().at(3) == firstArgumentValue) {
 				instructionPointer = i;	//set the instruction pointer to the while loop, we need it to check if it should run again
 				break;
